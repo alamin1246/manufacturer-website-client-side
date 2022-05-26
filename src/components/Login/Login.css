@@ -9,7 +9,9 @@
 }
 .form-container{
   border: 2px solid blue;
-  padding: 50px;
+  margin-top: 50px;
+  padding: 30px;
+  border-radius: 10px;
 
 }
 .forget-pass {

@@ -66,9 +66,9 @@ const SignUp = () => {
   return (
     <div className="container mx-auto my-5 sign-up-container login-box">
       <Form onSubmit={handleSignUp} className="form-container">
-        <h1 className="text-center text-primary">Register</h1>
+        <h1 className="text-center text-primary">Sign Up Now</h1>
         <Form.Group className="mb-3" controlId="formBasicEmail">
-          <Form.Label>Name</Form.Label>
+          <Form.Label>Client Name</Form.Label>
           <Form.Control
             onChange={(e) => setName(e.target.value)}
             name="name"
@@ -79,26 +79,23 @@ const SignUp = () => {
           <Form.Text className="text-muted"></Form.Text>
         </Form.Group>
         <Form.Group className="mb-3" controlId="formBasicEmail">
-          <Form.Label>Email address</Form.Label>
+          <Form.Label>Client Email Address</Form.Label>
           <Form.Control
             onChange={(e) => setEmail(e.target.value)}
             name="email"
             type="email"
-            placeholder="Enter email"
+            placeholder="Enter Your Email"
             required
           />
-          <Form.Text className="text-muted">
-            We'll never share your email with anyone else.
-          </Form.Text>
         </Form.Group>
 
         <Form.Group className="mb-3" controlId="formBasicPassword">
-          <Form.Label>Password</Form.Label>
+          <Form.Label>Set Password</Form.Label>
           <Form.Control
             onChange={(e) => setPassword(e.target.value)}
             name="password"
             type="password"
-            placeholder="Password"
+            placeholder="Set Password"
             required
           />
         </Form.Group>
