@@ -93,7 +93,7 @@ const AllProducts = () => {
                     </small>
                   ) : (
                     <small className="text-muted">
-                      <strong>Available Quantity: {availableQuantity}</strong>
+                      <strong>Available Quantity of Product: {availableQuantity}</strong>
                     </small>
                   )}
                 </div>
