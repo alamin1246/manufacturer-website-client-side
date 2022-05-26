@@ -94,7 +94,7 @@ const Login = () => {
               <Form.Control
                 onChange={(e) => setEmail(e.target.value)}
                 type="email"
-                placeholder="Enter email"
+                placeholder="Please Enter your Email"
                 required
               />
               <Form.Text className="text-muted">
@@ -107,7 +107,7 @@ const Login = () => {
               <Form.Control
                 onChange={(e) => setPassword(e.target.value)}
                 type="password"
-                placeholder="Password"
+                placeholder="Please Enter your Password"
                 required
               />
             </Form.Group>
