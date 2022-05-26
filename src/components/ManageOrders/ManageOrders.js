@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import axiosPrivate from "../../api/axiosPrivate";
 import auth from "../firebase.init";
 import useAllOrders from "../hooks/useAllOrders";
+import useProducts from "../hooks/useProducts";
 import Loading from "../Loading/Loading";
 
 const ManageOrders = () => {
@@ -13,28 +14,56 @@ const ManageOrders = () => {
   const [reload, setReload] = React.useState(false);
 
   const [allOrders, setAllOrders, isLoading] = useAllOrders(reload);
+  const [products, setProducts] = useProducts(reload);
 
-  const handleDeliver = (id) => {
-    console.log(id);
-    setReload(true);
-    axiosPrivate
-      .put(
-        `http://localhost:5000/orders/${id}`,
-        { isDelivered: true },
-        {
-          headers: {
-            email: authUser.email,
-          },
-        }
-      )
-      .then(({data}) => {
-        if(data.modifiedCount){
-          console.log(data);
-
-          setReload(false);
-          toast.success("Order Delivered");
-        }
-      });
+  const handleDeliver = async (id, productName, requiredQuantity, quantity, isPaid) => {
+    if (isPaid) {
+      console.log(id);
+      setReload(true);
+      axiosPrivate
+        .put(
+          `https://fast-springs-48095.herokuapp.com/orders/${id}`,
+          { isDelivered: true },
+          {
+            headers: {
+              email: authUser.email,
+            },
+          }
+        )
+        .then(({ data }) => {
+          if (data.modifiedCount) {
+            console.log(data);
+            const requiredProduct = products.find(
+              (product) => product.productName === productName
+            );
+            console.log(requiredProduct.productName);
+            const newProduct = {
+              availableQuantity: (
+                parseInt(requiredProduct.availableQuantity) -
+                parseInt(requiredQuantity)
+              ).toString(),
+            };
+            fetch(`https://fast-springs-48095.herokuapp.com/product/${requiredProduct._id}`, {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                email: `${authUser?.email}`,
+                authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+              },
+              body: JSON.stringify(newProduct),
+            })
+              .then((response) => response.json())
+              .then((json) => {
+                console.log(json);
+                setReload(false);
+                toast.success("Order Delivered");
+              });
+          }
+        });
+    }
+    else {
+      toast.error("Order is not paid yet!");
+    }
   };
 
   const reversedOrders = [...allOrders].reverse();
@@ -45,14 +74,16 @@ const ManageOrders = () => {
         _id,
         userName,
         userEmail,
-        toolName,
-        toolPrice,
+        productName,
+        productPrice,
         quantity,
         availableQuantity,
         totalPrice,
         isDelivered,
-
+        requiredQuantity,
         isPaid,
+        phoneNumber,
+        address
       },
       index
     ) => {
@@ -62,7 +93,7 @@ const ManageOrders = () => {
             <small>{index + 1}</small>
           </td>
           <td className="text-center">
-            <small>{toolName}</small>
+            <small>{productName}</small>
           </td>
           <td className="text-center">
             <small>{quantity}</small>
@@ -78,10 +109,12 @@ const ManageOrders = () => {
             <small>{userEmail}</small>
           </td>
           <td className="text-center">
-            <small>Dhaka, Bangladesh</small>
+            <small>{address ? address : "Dhaka, Bangladesh"}</small>
           </td>
           <td className="text-center">
-            <small>0195405915</small>
+            <small>{
+              phoneNumber ? phoneNumber : "01627948044"
+            }</small>
           </td>
 
           <td className="text-center ">
@@ -105,7 +138,15 @@ const ManageOrders = () => {
               </p>
             ) : (
               <button
-                onClick={() => handleDeliver(_id)}
+                onClick={() =>
+                  handleDeliver(
+                    _id,
+                    productName,
+                    requiredQuantity,
+                    quantity,
+                    isPaid
+                  )
+                }
                 className="btn btn-primary d-block mx-auto rounded-pill"
               >
                 <small>Deliver</small>
@@ -118,7 +159,7 @@ const ManageOrders = () => {
   );
   return (
     <div>
-      <h3 className="text-center text-success mb-4">Manage The Orders</h3>
+      <h3 className="text-center text-success mb-4">Manage the Clients Orders</h3>
       {isLoading ? (
         <Loading></Loading>
       ) : (

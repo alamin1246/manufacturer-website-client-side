@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Button, Card } from "react-bootstrap";
 import { useAuthState } from "react-firebase-hooks/auth";
 import toast from "react-hot-toast";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import axiosPrivate from "../../api/axiosPrivate";
 import auth from "../firebase.init";
 // import useOrders from "../hooks/useOrders";
@@ -31,7 +31,7 @@ const MyOrders = () => {
   // React Hook for Fetching All Books From The Server API
   useEffect(() => {
     setIsLoading(true);
-    fetch(`http://localhost:5000/orders/${authUser?.email}`, {
+    fetch(`https://fast-springs-48095.herokuapp.com/orders/${authUser?.email}`, {
       headers: {
         "Content-Type": "application/json",
         email: `${authUser?.email}`,
@@ -48,6 +48,14 @@ const MyOrders = () => {
   const reversedOrders = [...orders].reverse();
 
 
+  const navigate = useNavigate();
+
+  const handlePayment = (id) => {
+    navigate(`/payment/${id}`);
+    window.scrollTo(0, 0);
+
+  }
+
   console.log(reversedOrders);
 
   const order = reversedOrders.map(
@@ -62,6 +70,7 @@ const MyOrders = () => {
         totalPrice,
         isDelivered,
         isPaid,
+        transactionId
       },
       index
     ) => {
@@ -98,7 +107,7 @@ const MyOrders = () => {
                   <p className="mb-0 ms-3">
                     <small>
                       <i className="px-3 py-1 me-3  bg-danger text-white rounded-pill">
-                        Pending
+                        Delivery Pending
                       </i>
                     </small>
                   </p>
@@ -107,7 +116,7 @@ const MyOrders = () => {
             </Card.Title>
             <Card.Text>
               <p>
-                <strong>Price: Tk. {productPrice}</strong> (per piece)
+                <strong>Price: Tk. {productPrice}</strong> (Per Item)
               </p>
               <p>
                 <strong>Quantity: {quantity}</strong>
@@ -118,16 +127,21 @@ const MyOrders = () => {
             </Card.Text>
             <div className="d-flex justify-content-around">
               <div>
-                {isPaid ? (
+                {transactionId ? (
                   <p className="px-3 py-1 bg-success text-white rounded-pill">
-                    <strong>Paid</strong>
+                    <strong>Payment Completed</strong>{" "}
+                    <span>
+                      <small> (Transaction ID : {transactionId})</small>
+                    </span>
                   </p>
                 ) : (
-                  <Button variant="success">Pay Now</Button>
+                  <Button onClick={() => handlePayment(_id)} variant="success">
+                    Pay Now
+                  </Button>
                 )}
               </div>
               <div>
-                {!isDelivered && (
+                {!isPaid ? (
                   <div className="d-flex align-items-center ">
                     <div>
                       <Button
@@ -141,7 +155,7 @@ const MyOrders = () => {
                       </Button>
                     </div>
                   </div>
-                )}
+                ) : null}
               </div>
             </div>
           </Card.Body>
@@ -159,7 +173,12 @@ const MyOrders = () => {
     if (proceed) {
       setReload(true);
       axiosPrivate
-        .delete(`http://localhost:5000/orders/${cancelOrderId}`)
+        .delete(`https://fast-springs-48095.herokuapp.com/orders/${cancelOrderId}`, {
+          headers: {
+            "Content-Type": "application/json",
+            email: `${authUser?.email}`,
+          },
+        })
         .then(({ data }) => {
           console.log(data);
           if (data.deletedCount) {
@@ -169,7 +188,7 @@ const MyOrders = () => {
       setCancelOrderId("");
       setProceed(false);
     }
-  }, [proceed, cancelOrderId, boolean]);
+  }, [proceed, cancelOrderId, boolean, authUser?.email]);
 
   const handleCancelOrder = (id) => {
     console.log(id);

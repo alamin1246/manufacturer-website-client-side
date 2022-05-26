@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
 import axiosPrivate from "../../api/axiosPrivate";
 import auth from "../firebase.init";
+import Loading from "../Loading/Loading";
 import "./ConfirmPurchase.css";
 
 const ConfirmPurchase = () => {
@@ -15,41 +16,47 @@ const ConfirmPurchase = () => {
   const params = useParams();
   const [error, setError] = useState(null);
 
-  const [product, setProduct] = useState([]);
+  const [tool, setTool] = useState([]);
   const [reload, setReload] = useState(false);
   const [totalPrice, setTotalPrice] = useState("");
+  const [address, setAddress] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  console.log(address, phoneNumber);
   const handleGoBack = () => {
     navigate(-1);
+    window.scrollTo(0, 0);
   };
 
   useEffect(() => {
+    setReload(true);
     axiosPrivate
-      .get(`http://localhost:5000/products/${params.id}`, {
+      .get(`https://fast-springs-48095.herokuapp.com/tools/${params.id}`, {
         headers: {
           email: authUser?.email,
         },
       })
       .then((response) => {
         const { data } = response;
-        setProduct(data);
+        setTool(data);
         console.log(data);
+        setReload(false);
       });
   }, [authUser, params.id]);
 
   const {
-    productName,
-    productImage,
-    productDescription,
+    toolName,
+    toolImage,
+    toolDescription,
     availableQuantity,
-    productPrice,
+    toolPrice,
     minOrder,
-  } = product;
+  } = tool;
 
   const [requiredQuantity, setRequiredQuantity] = useState("");
 
   useEffect(() => {
     console.log(totalPrice);
-    setTotalPrice(parseInt(productPrice) * parseInt(requiredQuantity));
+    setTotalPrice(parseInt(toolPrice) * parseInt(requiredQuantity));
     if (parseInt(requiredQuantity) < parseInt(minOrder)) {
       setError("Minimum order is " + minOrder);
     } else if (parseInt(requiredQuantity) > parseInt(availableQuantity)) {
@@ -58,7 +65,7 @@ const ConfirmPurchase = () => {
       setError(null);
     }
   }
-    , [totalPrice, reload, requiredQuantity, productPrice, availableQuantity, minOrder]);
+    , [totalPrice, reload, requiredQuantity, toolPrice, availableQuantity, minOrder]);
 
 
   useEffect(() => {
@@ -70,43 +77,48 @@ const ConfirmPurchase = () => {
   const userOrder = {
     userName: authUser?.displayName,
     userEmail: authUser?.email,
-    productName,
+    toolName,
     quantity: requiredQuantity,
-    productImage,
-    productDescription,
+    toolImage,
+    toolDescription,
     availableQuantity,
-    productPrice,
+    toolPrice,
     minOrder,
     requiredQuantity,
     totalPrice,
+    address,
+    phoneNumber
   };
 
+  console.log(userOrder);
   const handleSubmit = () => {
-
-    axiosPrivate
-      .post(
-        "http://localhost:5000/orders",
-        userOrder,
-        {
+    if (address && phoneNumber) {
+      axiosPrivate
+        .post("https://fast-springs-48095.herokuapp.com/orders", userOrder, {
           headers: {
             email: authUser?.email,
           },
-        }
-      )
-      .then((response) => {
-        const { data } = response;
-        console.log(data);
-        if (data.insertedId) {
-          console.log("Order added to database");
-          setReload(!reload);
-          navigate("/dashboard/my-orders");
-          window.scrollTo(0, 0);
-          toast.success("Order Placed Successfully");
-
-        }
-      });
+        })
+        .then((response) => {
+          const { data } = response;
+          console.log(data);
+          if (data.insertedId) {
+            console.log("Order added to database");
+            setReload(!reload);
+            navigate("/dashboard/my-orders");
+            window.scrollTo(0, 0);
+            toast.success("Order Placed Successfully");
+          }
+        });
+    }
+    else {
+      toast.error("Please fill all the details");
+    }
   };
 
+  if (reload) {
+    return <Loading></Loading>
+  }
 
   return (
     <div>
@@ -114,30 +126,38 @@ const ConfirmPurchase = () => {
         <FontAwesomeIcon icon={faArrowLeft} />
       </div>
 
-      <div className="d-flex flex-lg-row flex-column justify-content-around align-items-center   container mx-auto">
-        <div className="update-stock-info mx-5">
-          <div className="card card-container mt-lg-5 mb-5">
+      <div className="d-flex flex-lg-row flex-column justify-content-around align-items-center   container ">
+        <div className="confirm-purchase-info mx-lg-5">
+          <div className="card mx-auto mt-lg-5 mb-5">
             <div className="mx-auto">
-              <img className="tool-img" src={productImage} alt="bookName" />
+              <img className="tool-img" src={toolImage} alt="bookName" />
             </div>
             <div className="card-body-update">
-              <h3 className="card-title text-center">{productName}</h3>
+              <h3 className="card-title text-center">{toolName}</h3>
               <div className="d-flex justify-content-around align-items-center my-3">
                 <h6 className="card-text mb-0 mx-3">
                   <small>Minimum Order : {minOrder} pieces</small>
                 </h6>
                 <p className="card-text tool-price ">
-                  <small>Tk. {productPrice} per piece</small>
+                  <small>Tk. {toolPrice} per piece</small>
                 </p>
               </div>
               <p className="card-text card-description px-5">
                 <span className="description">
                   {" "}
-                  <i>{productDescription?.slice(0, 100)}</i>{" "}
+                  <i>{toolDescription?.slice(0, 100)}</i>{" "}
                 </span>
               </p>
               <h6 className="card-text mb-3 text-center">
-                Available Quantity : {availableQuantity}
+                {parseInt(availableQuantity) === 0 ? (
+                  <span className="text-danger">
+                    <strong>Out Of Stock</strong>
+                  </span>
+                ) : (
+                  <small className="text-muted">
+                    <strong>Available Quantity: {availableQuantity}</strong>
+                  </small>
+                )}
               </h6>
             </div>
           </div>
@@ -146,7 +166,7 @@ const ConfirmPurchase = () => {
           <Form>
             <h1 className="mb-lg-0 mb-5 text-center">
               Please Confirm Your Purchase Order For{" "}
-              <span className="text-primary">{productName}</span>
+              <span className="text-primary">"{toolName}"</span>
             </h1>
             <Form.Group
               className="mb-3 mt-5"
@@ -177,7 +197,7 @@ const ConfirmPurchase = () => {
               <Form.Label className="checkout-labels">Selected Tool</Form.Label>
               <Form.Control
                 disabled
-                value={productName}
+                value={toolName}
                 type="text"
                 placeholder="Your Selected Tool"
                 required
@@ -186,7 +206,7 @@ const ConfirmPurchase = () => {
 
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Form.Label className="checkout-labels">
-                Number of Items You Want
+                Number of Pieces You Want
               </Form.Label>
               <Form.Control
                 value={requiredQuantity}
@@ -198,11 +218,13 @@ const ConfirmPurchase = () => {
                 name="quantity"
                 placeholder="Number of Stock"
                 required
+                disabled={parseInt(availableQuantity) === 0 ? true : false}
               />
               <p className="text-danger mt-2">
                 {error && requiredQuantity ? error : null}
               </p>
             </Form.Group>
+
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Form.Label className="checkout-labels">
                 Total Price (BDT)
@@ -214,18 +236,42 @@ const ConfirmPurchase = () => {
                     parseInt(requiredQuantity) >= parseInt(minOrder) &&
                     parseInt(requiredQuantity) <= parseInt(availableQuantity)
                     ? totalPrice
-                    : productPrice * minOrder
+                    : toolPrice * minOrder
                 }
                 onChange={(e) => {
                   setTotalPrice(
-                    parseInt(productPrice) * parseInt(requiredQuantity)
+                    parseInt(toolPrice) * parseInt(requiredQuantity)
                   );
                 }}
                 type="number"
                 name="quantity"
-                placeholder="Number of Products Stock"
+                placeholder="Number of Stock"
                 required
               />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+              <Form.Label>Your Contact Number</Form.Label>
+              <Form.Control
+                value={phoneNumber}
+                onChange={(e) => {
+                  setPhoneNumber(e.target.value);
+                }}
+                required
+                type="number"
+                placeholder="Your Phone Number"
+              />
+            </Form.Group>
+            <Form.Group
+              required
+              value={address}
+              onChange={(e) => {
+                setAddress(e.target.value);
+              }}
+              className="mb-3"
+              controlId="exampleForm.ControlTextarea1"
+            >
+              <Form.Label>Your Address</Form.Label>
+              <Form.Control as="textarea" rows={3} />
             </Form.Group>
           </Form>
         </div>
@@ -234,7 +280,9 @@ const ConfirmPurchase = () => {
       <div className="my-5">
         <button
           onClick={handleSubmit}
-          disabled={error ? true : false}
+          disabled={
+            error ? true : parseInt(availableQuantity) === 0 ? true : false
+          }
           className="btn btn-success d-block mx-auto px-5"
         >
           Confirm Your Order

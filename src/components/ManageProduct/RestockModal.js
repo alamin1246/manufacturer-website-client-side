@@ -9,7 +9,6 @@ const RestockModal = (props) => {
   console.log(products);
   console.log(restockId);
 
-
   const product = products.find((product) => product._id === restockId);
   console.log(product);
   const [quantity, setQuantity] = useState("");
@@ -22,7 +21,7 @@ const RestockModal = (props) => {
 
   const handleUpdateStock = (e) => {
     setReloadModal(true);
-    fetch(`http://localhost:5000/product/${restockId}`, {
+    fetch(`https://fast-springs-48095.herokuapp.com/product/${restockId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -56,7 +55,7 @@ const RestockModal = (props) => {
             <Form.Label>Product Name</Form.Label>
             <Form.Control
               type="text"
-              placeholder="HP M32f FHD Monitor"
+              placeholder="Product Name"
               value={product?.productName}
               disabled
             />

@@ -1,17 +1,16 @@
 import React from "react";
 import { Button, Form } from "react-bootstrap";
 import { useAuthState } from "react-firebase-hooks/auth";
+import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import auth from "../firebase.init";
-import "./AddProduct.css";
-import { useForm } from "react-hook-form";
 import useProducts from "../hooks/useProducts";
+import "./AddProduct.css";
 
 const AddProduct = () => {
 
   const [products, setProducts, isLoading] = useProducts();
   console.log(products);
-
 
 
   const {
@@ -21,14 +20,10 @@ const AddProduct = () => {
     reset,
   } = useForm();
 
-  // const handleAddProduct = (e) => {
-  //   e.preventDefault();
-  // };
 
   const [authUser] = useAuthState(auth);
 
-  //imgBB post API
-  //https://api.imgbb.com/1/upload?key=process.env.IMGBB_API_KEY
+
 
   const onSubmit = async (data) => {
     console.log(products.find((product) => product.productName === data.productName));
@@ -56,7 +51,7 @@ const AddProduct = () => {
               availableQuantity: data.availableQuantity,
               productDescription: data.productDescription,
             };
-            fetch("http://localhost:5000/product", {
+            fetch("https://fast-springs-48095.herokuapp.com/product", {
               method: "POST",
               headers: {
                 "content-type": "application/json",
@@ -86,7 +81,7 @@ const AddProduct = () => {
   return (
     <div>
       <h3 className="text-center text-success mb-4">
-        Add A Product In Our Database
+        Add A Product in the Database
       </h3>
       <Form
         onSubmit={handleSubmit(onSubmit)}
@@ -98,11 +93,11 @@ const AddProduct = () => {
             {...register("productName", {
               required: {
                 value: true,
-                message: "Product Price is Required",
+                message: "Product Name is Required",
               },
             })}
             type="text"
-            placeholder="Wrench"
+            placeholder="Product Name"
           />
           <p>
             {errors?.productName?.type === "required" && (
@@ -121,11 +116,11 @@ const AddProduct = () => {
               },
             })}
             type="number"
-            placeholder="Tk."
+            placeholder="Product Prince in Tk"
           />
           <p>
-            {errors?.toolPrice?.type === "required" && (
-              <span className="text-danger">{errors.toolPrice.message}</span>
+            {errors?.productPrice?.type === "required" && (
+              <span className="text-danger">{errors.productPrice.message}</span>
             )}
           </p>
         </Form.Group>
@@ -177,7 +172,7 @@ const AddProduct = () => {
               },
             })}
             type="file"
-            placeholder="1000"
+            placeholder="Product Image"
           />
           <p>
             {errors?.productImage?.type === "required" && (
@@ -220,7 +215,7 @@ const AddProduct = () => {
           className="px-4 d-block mx-auto"
           variant="primary"
         >
-          Add This Product
+          Add Product
         </Button>
       </Form>
     </div>

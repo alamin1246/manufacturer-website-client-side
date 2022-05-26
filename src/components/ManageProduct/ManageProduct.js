@@ -38,7 +38,7 @@ const ManageProduct = () => {
     console.log("data deleted");
     if (proceed) {
       setReload(true);
-      fetch(`http://localhost:5000/product/${deleteOrderId}`, {
+      fetch(`https://fast-springs-48095.herokuapp.com/product/${deleteOrderId}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
