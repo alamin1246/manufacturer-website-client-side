@@ -1,0 +1,31 @@
+.login-box{
+  border: 5px solid lightblue;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+.create-new-account {
+  cursor: pointer;
+}
+.form-container{
+  border: 2px solid blue;
+  padding: 50px;
+
+}
+.forget-pass {
+  cursor: pointer;
+}
+
+.login-container {
+  width: 50%;
+}
+
+@media screen and (max-width: 768px) {
+  .login-container {
+    width: 90% !important;
+  }
+}
+
+/* .login-box {
+  padding-top: 100px;
+} */
