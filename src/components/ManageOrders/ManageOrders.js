@@ -22,7 +22,7 @@ const ManageOrders = () => {
       setReload(true);
       axiosPrivate
         .put(
-          `https://fast-springs-48095.herokuapp.com/orders/${id}`,
+          `http://localhost:5000/orders/${id}`,
           { isDelivered: true },
           {
             headers: {
@@ -43,7 +43,7 @@ const ManageOrders = () => {
                 parseInt(requiredQuantity)
               ).toString(),
             };
-            fetch(`https://fast-springs-48095.herokuapp.com/product/${requiredProduct._id}`, {
+            fetch(`http://localhost:5000/product/${requiredProduct._id}`, {
               method: "PUT",
               headers: {
                 "Content-Type": "application/json",
@@ -113,7 +113,7 @@ const ManageOrders = () => {
           </td>
           <td className="text-center">
             <small>{
-              phoneNumber ? phoneNumber : "01627948044"
+              phoneNumber ? phoneNumber : "01954059415"
             }</small>
           </td>
 
@@ -159,7 +159,7 @@ const ManageOrders = () => {
   );
   return (
     <div>
-      <h3 className="text-center text-success mb-4">Manage the Clients Orders</h3>
+      <h3 className="text-center text-success mb-4">Manage The Orders</h3>
       {isLoading ? (
         <Loading></Loading>
       ) : (

@@ -1,16 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Card } from 'react-bootstrap';
-import { useAuthState } from 'react-firebase-hooks/auth';
 import { useNavigate } from 'react-router-dom';
+import { useAuthState } from 'react-firebase-hooks/auth';
 import auth from '../firebase.init';
 import useProducts from '../hooks/useProducts';
 import Loading from '../Loading/Loading';
 
-
 const AllProducts = () => {
   const [products, setProducts, isLoading] = useProducts();
   const [authUser] = useAuthState(auth);
-
   const navigate = useNavigate();
 
   const reversedProducts = [...products].reverse();
@@ -20,7 +18,7 @@ const AllProducts = () => {
 
   useEffect(() => {
     fetch(
-      `https://fast-springs-48095.herokuapp.com/admin/${authUser?.email}`,
+      `http://localhost:5000/admin/${authUser?.email}`,
       {
         method: "GET",
         headers: {
@@ -36,7 +34,7 @@ const AllProducts = () => {
         setAdmin(data);
       });
 
-    fetch(`https://fast-springs-48095.herokuapp.com/user/${authUser?.email}`, {
+    fetch(`http://localhost:5000/${authUser?.email}`, {
       method: "GET",
       headers: {
         "content-type": "application/json",
@@ -50,7 +48,6 @@ const AllProducts = () => {
         setUser(data);
       });
   }, [authUser?.email]);
-
   const handleConfirmPurchase = (id) => {
     navigate(`/confirm-purchase/${id}`);
     window.scrollTo(0, 0);
@@ -67,8 +64,11 @@ const AllProducts = () => {
       productDescription,
     }) => {
       return (
-        <div className="col-md-4 col-sm-6 mb-4 tool-card">
-          <Card className="shadow " style={{ height: "490px" }}>
+        <div className="col-md-4 sm:cols-sm-6 mb-4 tool-card">
+          <Card
+            className="shadow "
+            style={{ width: "21rem", height: "600px" }}
+          >
             <Card.Img className="tool-img" variant="top" src={productImage} />
             <Card.Body>
               <Card.Title className="text-center  tool-header">
@@ -79,26 +79,25 @@ const AllProducts = () => {
                   {productDescription.slice(0, 60)}...
                 </p>
                 <p className="mb-2">
-                  <strong>Price: Tk. {productPrice}</strong> (Per Item)
+                  <strong>Product Price: Tk. {productPrice}</strong> (Per Item)
                 </p>
                 <small>
-                  <strong className="text-muted">
+                  <strong className="text-success">
                     Minimum Order Quantity: {minOrder}
                   </strong>
                 </small>
                 <div>
-                  {parseInt(availableQuantity) === 0 ? (
+                  {parseFloat(availableQuantity) === 0 ? (
                     <small className="text-danger">
-                      <strong>Out Of the stocks</strong>
+                      <strong>Out Of the Stocks</strong>
                     </small>
                   ) : (
                     <small className="text-muted">
-                      <strong>Available Quantity of Product: {availableQuantity}</strong>
+                      <strong>Available Quantity: {availableQuantity}</strong>
                     </small>
                   )}
                 </div>
               </Card.Text>
-
               {(user?.role === "user" &&
                 admin?.role !==
                 "admin") || !authUser ? (
@@ -118,14 +117,13 @@ const AllProducts = () => {
       );
     }
   );
-
   return (
     <div className="my-5">
       <div>
         {isLoading ? (
           <Loading></Loading>
         ) : (
-          <div className="row container mx-auto ">{singleProduct}</div>
+          <div className="row container mx-auto">{singleProduct}</div>
         )}
       </div>
     </div>

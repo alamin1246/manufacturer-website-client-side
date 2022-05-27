@@ -1,50 +1,18 @@
-import React, { useEffect, useState } from "react";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { NavLink, Outlet, useLocation } from "react-router-dom";
-import auth from "../firebase.init";
-import "./Dashboard.css";
+import React, { useEffect, useState } from 'react';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { NavLink, Outlet, useLocation } from 'react-router-dom';
+import auth from '../firebase.init';
+import useAdmin from '../hooks/useAdmin';
+import "./Dashboard.css"
 
 const Dashboard = () => {
   const { pathname } = useLocation();
-  const [authUser] = useAuthState(auth);
-  const [admin, setAdmin] = useState({});
-  const [user, setUser] = useState({});
+  const [user] = useAuthState(auth);
   console.log(user);
+  const [admin] = useAdmin(user);
+
   console.log(admin);
-  useEffect(() => {
-    fetch(
-      `https://fast-springs-48095.herokuapp.com/admin/${authUser?.email}`,
-      {
-        method: "GET",
-        headers: {
-          "content-type": "application/json",
-          authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          email: `${authUser?.email}`,
-        },
-      }
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-        setAdmin(data);
-      });
-
-    fetch(`https://fast-springs-48095.herokuapp.com/user/${authUser?.email}`, {
-      method: "GET",
-      headers: {
-        "content-type": "application/json",
-        authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        email: `${authUser?.email}`,
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-        setUser(data);
-      });
-  }, [authUser?.email]);
-
-
+  // console.log(admin);
 
   const [showDashboard, setShowDashboard] = useState(false);
   console.log(showDashboard);
@@ -52,20 +20,22 @@ const Dashboard = () => {
   console.log(windowWidth);
 
   const handleShowDashboard = () => {
-    setShowDashboard((prevState) => !prevState);
-  };
+    setShowDashboard(
+      (prevState) => !prevState
+    );
+  }
 
-  // Trigger change of window width with useEffect
 
   useEffect(() => {
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
-    };
-    window.addEventListener("resize", handleResize);
+    }
+    window.addEventListener('resize', handleResize);
     return () => {
-      window.removeEventListener("resize", handleResize);
-    };
+      window.removeEventListener('resize', handleResize);
+    }
   }, [windowWidth]);
+
 
   return (
     <div>
@@ -73,7 +43,9 @@ const Dashboard = () => {
         onClick={handleShowDashboard}
         className="d-block btn btn-success my-5 mx-auto  d-lg-none"
       >
-        {showDashboard ? "Hide Sections" : "Show Sections"}
+        {
+          showDashboard ? 'Hide Sections' : 'Show Sections'
+        }
       </button>
 
       <div className="my-5 d-flex">
@@ -81,47 +53,43 @@ const Dashboard = () => {
           className={
             windowWidth > 768
               ? `dashboard-sidebar shadow  ms-5 mb-5 pt-5 d-lg-block d-none`
-              : showDashboard
-                ? `d-block visible-sidebar shadow-lg`
-                : `d-none hidden-sidebar`
+              : showDashboard ? `d-block visible-sidebar shadow-lg` : `d-none hidden-sidebar`
           }
         >
-          {user?.role === "user" && admin?.role !== "admin" ? (
-            <div>
-              <div className="d-flex justify-content-center">
-                <NavLink
-                  className={({ isActive }) =>
-                    isActive
-                      ? `dashboard-active-link `
-                      : `dashboard-inactive-link `
-                  }
-                  to="/dashboard/my-orders"
-                >
-                  My Orders
-                </NavLink>
-              </div>
+          <div className={admin ? "d-none" : "d-block"}>
+            <div className="d-flex justify-content-center">
+              <NavLink
+                className={({ isActive }) =>
+                  isActive
+                    ? `dashboard-active-link `
+                    : `dashboard-inactive-link `
+                }
+                to="/dashboard/my-orders"
+              >
+                My Orders
+              </NavLink>
             </div>
-          ) : null}
-          {user?.role === "user" && admin?.role !== "admin" ? (
-            <div>
-              <div className="d-flex justify-content-center">
-                <NavLink
-                  className={({ isActive }) =>
-                    isActive
-                      ? `dashboard-active-link  my-4`
-                      : `dashboard-inactive-link my-4 `
-                  }
-                  to="/dashboard/add-review"
-                >
-                  Add Review
-                </NavLink>
-              </div>
+          </div>
+          <div className={admin ? "d-none" : "d-block"}>
+            <div className="d-flex justify-content-center">
+              <NavLink
+                className={({ isActive }) =>
+                  isActive
+                    ? `dashboard-active-link  my-4`
+                    : `dashboard-inactive-link my-4 `
+                }
+                to="/dashboard/add-review"
+              >
+                Add Review
+              </NavLink>
             </div>
-          ) : null}
+          </div>
           <div className="d-flex justify-content-center">
             <NavLink
               className={({ isActive }) =>
-                isActive ? `dashboard-active-link ` : `dashboard-inactive-link `
+                isActive
+                  ? `dashboard-active-link `
+                  : `dashboard-inactive-link `
               }
               to="/dashboard/my-profile"
             >
@@ -129,7 +97,7 @@ const Dashboard = () => {
             </NavLink>
           </div>
           <div>
-            {user?.role === "user" && admin?.role === "admin" ? (
+            {admin && (
               <div className="d-flex justify-content-center">
                 <NavLink
                   className={({ isActive }) =>
@@ -142,10 +110,10 @@ const Dashboard = () => {
                   Manage Orders
                 </NavLink>
               </div>
-            ) : null}
+            )}
           </div>
           <div>
-            {user?.role === "user" && admin?.role === "admin" ? (
+            {admin && (
               <div className="d-flex justify-content-center">
                 <NavLink
                   className={({ isActive }) =>
@@ -158,10 +126,10 @@ const Dashboard = () => {
                   Add Product
                 </NavLink>
               </div>
-            ) : null}
+            )}
           </div>
           <div>
-            {(user?.role === "user" && admin?.role === "admin") ? (
+            {admin && (
               <div className="d-flex justify-content-center">
                 <NavLink
                   className={({ isActive }) =>
@@ -174,11 +142,10 @@ const Dashboard = () => {
                   Make Admin
                 </NavLink>
               </div>
-            )
-              : null}
+            )}
           </div>
           <div>
-            {(user?.role === "user" && admin?.role === "admin") ? (
+            {admin && (
               <div className="d-flex justify-content-center">
                 <NavLink
                   className={({ isActive }) =>
@@ -191,8 +158,7 @@ const Dashboard = () => {
                   Manage Product
                 </NavLink>
               </div>
-            )
-              : null}
+            )}
           </div>
         </div>
         <div className="right-dashboard">

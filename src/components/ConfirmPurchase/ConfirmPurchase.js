@@ -7,8 +7,8 @@ import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
 import axiosPrivate from "../../api/axiosPrivate";
 import auth from "../firebase.init";
-import Loading from "../Loading/Loading";
 import "./ConfirmPurchase.css";
+import Loading from "../Loading/Loading";
 
 const ConfirmPurchase = () => {
   const navigate = useNavigate();
@@ -16,56 +16,55 @@ const ConfirmPurchase = () => {
   const params = useParams();
   const [error, setError] = useState(null);
 
-  const [tool, setTool] = useState([]);
+  const [product, setProduct] = useState([]);
   const [reload, setReload] = useState(false);
   const [totalPrice, setTotalPrice] = useState("");
   const [address, setAddress] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   console.log(address, phoneNumber);
+
   const handleGoBack = () => {
     navigate(-1);
-    window.scrollTo(0, 0);
   };
 
   useEffect(() => {
-    setReload(true);
     axiosPrivate
-      .get(`https://fast-springs-48095.herokuapp.com/tools/${params.id}`, {
+      .get(`http://localhost:5000/products/${params.id}`, {
         headers: {
           email: authUser?.email,
         },
       })
       .then((response) => {
         const { data } = response;
-        setTool(data);
+        setProduct(data);
         console.log(data);
         setReload(false);
       });
   }, [authUser, params.id]);
 
   const {
-    toolName,
-    toolImage,
-    toolDescription,
+    productName,
+    productImage,
+    productDescription,
     availableQuantity,
-    toolPrice,
+    productPrice,
     minOrder,
-  } = tool;
+  } = product;
 
   const [requiredQuantity, setRequiredQuantity] = useState("");
 
   useEffect(() => {
     console.log(totalPrice);
-    setTotalPrice(parseInt(toolPrice) * parseInt(requiredQuantity));
+    setTotalPrice(parseInt(productPrice) * parseInt(requiredQuantity));
     if (parseInt(requiredQuantity) < parseInt(minOrder)) {
       setError("Minimum order is " + minOrder);
     } else if (parseInt(requiredQuantity) > parseInt(availableQuantity)) {
-      setError("Not enough quantity");
+      setError("Not Enough");
     } else {
       setError(null);
     }
   }
-    , [totalPrice, reload, requiredQuantity, toolPrice, availableQuantity, minOrder]);
+    , [totalPrice, reload, requiredQuantity, productPrice, availableQuantity, minOrder]);
 
 
   useEffect(() => {
@@ -77,12 +76,12 @@ const ConfirmPurchase = () => {
   const userOrder = {
     userName: authUser?.displayName,
     userEmail: authUser?.email,
-    toolName,
+    productName,
     quantity: requiredQuantity,
-    toolImage,
-    toolDescription,
+    productImage,
+    productDescription,
     availableQuantity,
-    toolPrice,
+    productPrice,
     minOrder,
     requiredQuantity,
     totalPrice,
@@ -90,15 +89,18 @@ const ConfirmPurchase = () => {
     phoneNumber
   };
 
-  console.log(userOrder);
   const handleSubmit = () => {
     if (address && phoneNumber) {
       axiosPrivate
-        .post("https://fast-springs-48095.herokuapp.com/orders", userOrder, {
-          headers: {
-            email: authUser?.email,
-          },
-        })
+        .post(
+          "http://localhost:5000/orders",
+          userOrder,
+          {
+            headers: {
+              email: authUser?.email,
+            },
+          }
+        )
         .then((response) => {
           const { data } = response;
           console.log(data);
@@ -107,12 +109,12 @@ const ConfirmPurchase = () => {
             setReload(!reload);
             navigate("/dashboard/my-orders");
             window.scrollTo(0, 0);
-            toast.success("Order Placed Successfully");
+            toast.success("Order Successfully");
           }
         });
     }
     else {
-      toast.error("Please fill all the details");
+      toast.error("Please fill up correctly");
     }
   };
 
@@ -120,38 +122,39 @@ const ConfirmPurchase = () => {
     return <Loading></Loading>
   }
 
+
   return (
     <div>
       <div className="back-btn" onClick={handleGoBack}>
         <FontAwesomeIcon icon={faArrowLeft} />
       </div>
 
-      <div className="d-flex flex-lg-row flex-column justify-content-around align-items-center   container ">
-        <div className="confirm-purchase-info mx-lg-5">
-          <div className="card mx-auto mt-lg-5 mb-5">
+      <div className="d-flex flex-lg-row flex-column justify-content-around align-items-center   container mx-auto">
+        <div className="update-stock-info mx-5">
+          <div className="card card-container mt-lg-5 mb-5">
             <div className="mx-auto">
-              <img className="tool-img" src={toolImage} alt="bookName" />
+              <img className="tool-img" src={productImage} alt="bookName" />
             </div>
             <div className="card-body-update">
-              <h3 className="card-title text-center">{toolName}</h3>
+              <h3 className="card-title text-center">{productName}</h3>
               <div className="d-flex justify-content-around align-items-center my-3">
                 <h6 className="card-text mb-0 mx-3">
                   <small>Minimum Order : {minOrder} pieces</small>
                 </h6>
                 <p className="card-text tool-price ">
-                  <small>Tk. {toolPrice} per piece</small>
+                  <small>Tk. {productPrice} per piece</small>
                 </p>
               </div>
               <p className="card-text card-description px-5">
                 <span className="description">
                   {" "}
-                  <i>{toolDescription?.slice(0, 100)}</i>{" "}
+                  <i>{productDescription?.slice(0, 100)}</i>{" "}
                 </span>
               </p>
               <h6 className="card-text mb-3 text-center">
                 {parseInt(availableQuantity) === 0 ? (
                   <span className="text-danger">
-                    <strong>Out Of Stock</strong>
+                    <strong>Out Of the stocks</strong>
                   </span>
                 ) : (
                   <small className="text-muted">
@@ -165,8 +168,8 @@ const ConfirmPurchase = () => {
         <div className="update-stock-form mt-lg-0 mt-5">
           <Form>
             <h1 className="mb-lg-0 mb-5 text-center">
-              Please Confirm Your Purchase Order For{" "}
-              <span className="text-primary">"{toolName}"</span>
+              Please Confirm Your Purchase {" "}
+              <span className="text-primary">{productName}</span>
             </h1>
             <Form.Group
               className="mb-3 mt-5"
@@ -177,7 +180,7 @@ const ConfirmPurchase = () => {
                 disabled={authUser?.displayName ? true : false}
                 value={authUser?.displayName}
                 type="text"
-                placeholder="First Name"
+                placeholder="Enter your Name"
                 required
               />
             </Form.Group>
@@ -186,7 +189,7 @@ const ConfirmPurchase = () => {
               <Form.Label className="checkout-labels">Email address</Form.Label>
               <Form.Control
                 type="email"
-                placeholder="name@example.com"
+                placeholder="Enter your email"
                 value={authUser?.email}
                 required
                 disabled={authUser?.email ? true : false}
@@ -194,10 +197,10 @@ const ConfirmPurchase = () => {
             </Form.Group>
 
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-              <Form.Label className="checkout-labels">Selected Tool</Form.Label>
+              <Form.Label className="checkout-labels">Selected Product</Form.Label>
               <Form.Control
                 disabled
-                value={toolName}
+                value={productName}
                 type="text"
                 placeholder="Your Selected Tool"
                 required
@@ -206,7 +209,7 @@ const ConfirmPurchase = () => {
 
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Form.Label className="checkout-labels">
-                Number of Pieces You Want
+                Number of Items You Want
               </Form.Label>
               <Form.Control
                 value={requiredQuantity}
@@ -224,7 +227,6 @@ const ConfirmPurchase = () => {
                 {error && requiredQuantity ? error : null}
               </p>
             </Form.Group>
-
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Form.Label className="checkout-labels">
                 Total Price (BDT)
@@ -236,42 +238,18 @@ const ConfirmPurchase = () => {
                     parseInt(requiredQuantity) >= parseInt(minOrder) &&
                     parseInt(requiredQuantity) <= parseInt(availableQuantity)
                     ? totalPrice
-                    : toolPrice * minOrder
+                    : productPrice * minOrder
                 }
                 onChange={(e) => {
                   setTotalPrice(
-                    parseInt(toolPrice) * parseInt(requiredQuantity)
+                    parseInt(productPrice) * parseInt(requiredQuantity)
                   );
                 }}
                 type="number"
                 name="quantity"
-                placeholder="Number of Stock"
+                placeholder="Number of Products Stock"
                 required
               />
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-              <Form.Label>Your Contact Number</Form.Label>
-              <Form.Control
-                value={phoneNumber}
-                onChange={(e) => {
-                  setPhoneNumber(e.target.value);
-                }}
-                required
-                type="number"
-                placeholder="Your Phone Number"
-              />
-            </Form.Group>
-            <Form.Group
-              required
-              value={address}
-              onChange={(e) => {
-                setAddress(e.target.value);
-              }}
-              className="mb-3"
-              controlId="exampleForm.ControlTextarea1"
-            >
-              <Form.Label>Your Address</Form.Label>
-              <Form.Control as="textarea" rows={3} />
             </Form.Group>
           </Form>
         </div>
@@ -280,12 +258,10 @@ const ConfirmPurchase = () => {
       <div className="my-5">
         <button
           onClick={handleSubmit}
-          disabled={
-            error ? true : parseInt(availableQuantity) === 0 ? true : false
-          }
+          disabled={error ? true : parseInt(availableQuantity) === 0 ? true : false}
           className="btn btn-success d-block mx-auto px-5"
         >
-          Confirm Your Order
+          Confirm Your Purchase
         </button>
       </div>
     </div>

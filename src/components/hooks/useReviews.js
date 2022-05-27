@@ -18,7 +18,7 @@ const useReviews = () => {
   // React Hook for Fetching All Books From The Server API
   useEffect(() => {
     setIsLoading(true);
-    fetch("https://fast-springs-48095.herokuapp.com/reviews", {
+    fetch("http://localhost:5000/reviews", {
       headers: {
         "Content-Type": "application/json",
         email: `${authUser?.email}`,

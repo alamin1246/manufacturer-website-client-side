@@ -1,16 +1,17 @@
 import React from "react";
 import { Button, Form } from "react-bootstrap";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import auth from "../firebase.init";
-import useProducts from "../hooks/useProducts";
 import "./AddProduct.css";
+import { useForm } from "react-hook-form";
+import useProducts from "../hooks/useProducts";
 
 const AddProduct = () => {
 
   const [products, setProducts, isLoading] = useProducts();
   console.log(products);
+
 
 
   const {
@@ -51,7 +52,7 @@ const AddProduct = () => {
               availableQuantity: data.availableQuantity,
               productDescription: data.productDescription,
             };
-            fetch("https://fast-springs-48095.herokuapp.com/product", {
+            fetch("http://localhost:5000/product", {
               method: "POST",
               headers: {
                 "content-type": "application/json",
@@ -81,7 +82,7 @@ const AddProduct = () => {
   return (
     <div>
       <h3 className="text-center text-success mb-4">
-        Add A Product in the Database
+        Add A Product in Stock
       </h3>
       <Form
         onSubmit={handleSubmit(onSubmit)}
@@ -93,7 +94,7 @@ const AddProduct = () => {
             {...register("productName", {
               required: {
                 value: true,
-                message: "Product Name is Required",
+                message: "Product Price is Required",
               },
             })}
             type="text"
@@ -116,11 +117,11 @@ const AddProduct = () => {
               },
             })}
             type="number"
-            placeholder="Product Prince in Tk"
+            placeholder="Tk."
           />
           <p>
-            {errors?.productPrice?.type === "required" && (
-              <span className="text-danger">{errors.productPrice.message}</span>
+            {errors?.toolPrice?.type === "required" && (
+              <span className="text-danger">{errors.toolPrice.message}</span>
             )}
           </p>
         </Form.Group>
@@ -172,7 +173,7 @@ const AddProduct = () => {
               },
             })}
             type="file"
-            placeholder="Product Image"
+            placeholder="1000"
           />
           <p>
             {errors?.productImage?.type === "required" && (
@@ -215,7 +216,7 @@ const AddProduct = () => {
           className="px-4 d-block mx-auto"
           variant="primary"
         >
-          Add Product
+          Add This Product
         </Button>
       </Form>
     </div>

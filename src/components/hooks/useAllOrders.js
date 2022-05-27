@@ -17,7 +17,7 @@ const useAllOrders = (reload) => {
   // React Hook for Fetching All Books From The Server API
   useEffect(() => {
     setIsLoading(true);
-    fetch("https://fast-springs-48095.herokuapp.com/orders", {
+    fetch("http://localhost:5000/orders", {
       headers: {
         "Content-Type": "application/json",
         email: `${authUser?.email}`,

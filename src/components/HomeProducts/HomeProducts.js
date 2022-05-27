@@ -11,6 +11,8 @@ const HomeProducts = () => {
 
   const navigate = useNavigate();
 
+  //Reverse an products array
+
   const slicedProducts = [...products].reverse().slice(0, 6);
   console.log(slicedProducts);
 
@@ -50,7 +52,7 @@ const HomeProducts = () => {
                   <strong>Price: Tk. {productPrice}</strong> (per item)
                 </p>
                 <small>
-                  <strong className="text-muted">
+                  <strong className="text-danger">
                     Minimum Order Quantity: {minOrder}
                   </strong>
                 </small>

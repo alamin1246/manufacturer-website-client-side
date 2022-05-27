@@ -10,16 +10,16 @@ import "./Payment.css"
 import PaymentModal from './PaymentModal';
 
 const Payment = () => {
-  const [modalShowPayment, setModalShowPayment] = React.useState(false);
+    const [modalShowPayment, setModalShowPayment] = React.useState(false);
 
-  const navigate = useNavigate();
+    const navigate = useNavigate();
 
     const handleGoBack = () => {
-      navigate(-1);
+        navigate(-1);
     };
 
-    const {id} = useParams();
-  const [authUser] = useAuthState(auth);
+    const { id } = useParams();
+    const [authUser] = useAuthState(auth);
 
     const [orders] = useOrders(authUser?.email)
 
@@ -28,35 +28,35 @@ const Payment = () => {
     }
     const requiredOrder = orders.find(order => order._id === id);
     return (
-      <div className="">
-        <div className="back-btn" onClick={handleGoBack}>
-          <FontAwesomeIcon icon={faArrowLeft} />
+        <div className="">
+            <div className="back-btn" onClick={handleGoBack}>
+                <FontAwesomeIcon icon={faArrowLeft} />
+            </div>
+            <div className="d-flex justify-content-center align-items-center payment-div ">
+                <div>
+                    <Card className="text-center mb-5 mx-auto">
+                        <Card.Header>
+                            <h2 className="text-danger">
+                                Please Pay For {requiredOrder?.productName}
+                            </h2>
+                        </Card.Header>
+                        <Card.Body className="h-50">
+                            <h5>Payment Amount : Tk. {requiredOrder?.totalPrice}</h5>
+                            <Button onClick={() => handleProceedPayment()} className="d-block mx-auto mt-4" variant="success">
+                                Proceed
+                            </Button>
+                        </Card.Body>
+                    </Card>
+                </div>
+            </div>
+            <PaymentModal
+                show={modalShowPayment}
+                requiredOrder={requiredOrder}
+                onHide={() => {
+                    setModalShowPayment(false);
+                }}
+            ></PaymentModal>
         </div>
-        <div className="d-flex justify-content-center align-items-center payment-div ">
-          <div>
-            <Card className="text-center mb-5 mx-auto">
-              <Card.Header>
-                <h2 className="text-danger">
-                  Please Pay For {requiredOrder?.productName}
-                </h2>
-              </Card.Header>
-              <Card.Body className="h-50">
-                <h5>Payment Amount : Tk. {requiredOrder?.totalPrice}</h5>
-                <Button  onClick={() => handleProceedPayment()} className="d-block mx-auto mt-4" variant="success">
-                  Proceed
-                </Button>
-              </Card.Body>
-            </Card>
-          </div>
-        </div>
-        <PaymentModal
-          show={modalShowPayment}
-          requiredOrder={requiredOrder}
-          onHide={() => {
-            setModalShowPayment(false);
-          }}
-        ></PaymentModal>
-      </div>
     );
 };
 

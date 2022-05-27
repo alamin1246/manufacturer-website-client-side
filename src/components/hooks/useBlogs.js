@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import  { useEffect, useState } from 'react';
 
 const useBlogs = () => {
   //Declaring React States
@@ -8,7 +8,7 @@ const useBlogs = () => {
   // useEffect Hook to Fetch blogs data from server api
   useEffect(() => {
     setIsLoading(true);
-    fetch("https://fast-springs-48095.herokuapp.com/blogs")
+    fetch("http://localhost:5000/blogs")
       .then((res) => res.json())
       .then((data) => {
         setBlogs(data);

@@ -14,7 +14,7 @@ const DeleteModal = (props) => {
         <Modal.Title id="contained-modal-title-vcenter"></Modal.Title>
       </Modal.Header>
       <Modal.Body closeButton>
-        <h3 className="text-center ">Do You Want to Remove the Product?</h3>
+        <h3 className="text-center ">Do You Want to Remove This Product?</h3>
       </Modal.Body>
       <Modal.Footer>
         <Button
@@ -32,7 +32,7 @@ const DeleteModal = (props) => {
           className="btn btn-success d-block mx-auto px-5"
           onClick={() => {
             props.onHide();
-
+            
           }}
         >
           No

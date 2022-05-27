@@ -8,11 +8,10 @@ const MyProfile = () => {
   const [authUser] = useAuthState(auth);
   const [reload, setReload] = useState(false);
 
-
   const [user, setUser] = useState({});
 
   useEffect(() => {
-    fetch(`https://fast-springs-48095.herokuapp.com/user/${authUser?.email}`, {
+    fetch(`http://localhost:5000/user/${authUser?.email}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -28,7 +27,7 @@ const MyProfile = () => {
 
   setTimeout(() => {
     setReload(!reload);
-  }, 1000);
+  }, 100);
 
   const navigate = useNavigate();
 
@@ -48,8 +47,8 @@ const MyProfile = () => {
                 user.photoURL
                   ? user.photoURL
                   : authUser?.photoURL
-                    ? authUser?.photoURL
-                    : "https://foxdogconsultants.com/wp-content/plugins/all-in-one-seo-pack/images/default-user-image.png"
+                  ? authUser?.photoURL
+                  : "https://foxdogconsultants.com/wp-content/plugins/all-in-one-seo-pack/images/default-user-image.png"
               }
               alt="userPhoto"
             />
@@ -68,8 +67,8 @@ const MyProfile = () => {
               {authUser?.displayName
                 ? authUser?.displayName
                 : user?.displayName
-                  ? user?.displayName
-                  : "N/A"}
+                ? user?.displayName
+                : "N/A"}
             </span>
           </p>
           <p>

@@ -16,7 +16,6 @@ axiosPrivate.interceptors.request.use(
   }
 );
 
-
 axiosPrivate.interceptors.response.use(
   function (response) {
     return response;

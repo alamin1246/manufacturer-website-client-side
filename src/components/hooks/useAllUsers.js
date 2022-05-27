@@ -17,7 +17,7 @@ const useAllUsers = (reload) => {
   // React Hook for Fetching All Books From The Server API
   useEffect(() => {
     setIsLoading(true);
-    fetch("https://fast-springs-48095.herokuapp.com/users", {
+    fetch("http://localhost:5000/users", {
       headers: {
         "Content-Type": "application/json",
         email: `${authUser?.email}`,
